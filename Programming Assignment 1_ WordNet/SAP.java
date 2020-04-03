@@ -8,6 +8,18 @@ import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+/**
+ * Shortest ancestral path({@code SAP}). An ancestral path between two vertices
+ * v and w in a digraph is a directed path from v to a common ancestor x,
+ * together with a directed path from w to the same ancestor x. A shortest
+ * ancestral path is an ancestral path of minimum total length. We refer to the
+ * common ancestor in a shortest ancestral path as a shortest common ancestor.
+ * Note also that an ancestral path is a path, but not a directed path.
+ * 
+ * @author Li Li
+ * @since Apr. 4
+ * @version v0.2
+ */
 public class SAP {
 
     private static final int INFINITY = Integer.MAX_VALUE;
@@ -55,7 +67,7 @@ public class SAP {
      * @param w
      * @throws IllegalArgumentException Vertex argument is outside its prescribed
      *                                  range
-     * @return
+     * @return length of shortest ancestral path between v and w; -1 if no such path
      */
     public int length(int v, int w) {
 
@@ -81,7 +93,8 @@ public class SAP {
      * @param w
      * @throws IllegalArgumentException Vertex argument is outside its prescribed
      *                                  range
-     * @return
+     * @return a common ancestor of v and w that participates in a shortest
+     *         ancestral path
      */
     public int ancestor(int v, int w) {
         int numV = graph.V();
@@ -117,7 +130,8 @@ public class SAP {
      * @param w
      * @throws IllegalArgumentException unless {@code 0 <= v < V} for each vertex in
      *                                  v
-     * @return
+     * @return length of shortest ancestral path between any vertex in v and any
+     *         vertex in w; -1 if no such path
      */
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
 
@@ -150,7 +164,8 @@ public class SAP {
      * @param w
      * @throws IllegalArgumentException unless {@code 0 <= v < V} for each vertex in
      *                                  v
-     * @return
+     * @return a common ancestor that participates in shortest ancestral path; -1 if
+     *         no such path
      */
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
 
@@ -167,6 +182,7 @@ public class SAP {
     }
 
     /**
+     * Check if any vertex argument is outside its prescribed range
      * 
      * @param v
      * @param V
@@ -178,6 +194,7 @@ public class SAP {
     }
 
     /**
+     * Check if any vertices arguments are outside its prescribed range
      * 
      * @param vertices
      * @param V

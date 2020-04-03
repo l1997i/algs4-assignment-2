@@ -19,7 +19,7 @@ import edu.princeton.cs.algs4.Topological;
  * 
  * @author Li Li
  * @since Apr. 2
- * @version v0.1
+ * @version v0.2
  * 
  */
 public class WordNet {
@@ -27,7 +27,7 @@ public class WordNet {
     private ST<String, SET<Integer>> synsets;
     private ST<Integer, String> id_nouns;
     private Digraph wordGraph;
-    private int outSum = 0;                        // the totoal number of out edges
+    private int outSum = 0; // the totoal number of out edges
     private int num = 0;
 
     /**
@@ -74,7 +74,7 @@ public class WordNet {
     private void getHypernyms(String hypernyms) {
         In hypernym = new In(hypernyms);
         wordGraph = new Digraph(num);
-        boolean vIsOut[] = new boolean[num];   // does this vertice has an edge out?
+        boolean vIsOut[] = new boolean[num]; // does this vertice has an edge out?
         while (hypernym.hasNextLine()) {
             String fields[] = hypernym.readLine().split(",");
             Integer hyponymId = Integer.parseInt(fields[0]);
@@ -92,13 +92,13 @@ public class WordNet {
         isRootedDAG();
     }
 
-    private void isRootedDAG(){
-        if (num - outSum!=1){
+    private void isRootedDAG() {
+        if (num - outSum != 1) {
             throw new IllegalArgumentException("The input to the constructor does not correspond to a rooted graph");
         }
 
         Topological testDAG = new Topological(wordGraph);
-        if (!testDAG.hasOrder()){
+        if (!testDAG.hasOrder()) {
             throw new IllegalArgumentException("The input to the constructor does not correspond to a DAG");
         }
     }
@@ -128,14 +128,17 @@ public class WordNet {
      *
      * @param nounA
      * @param nounB
-     * @return
+     * @return distance between nounA and nounB
      */
     public int distance(String nounA, String nounB) {
         if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException("Any of the noun arguments in distance() is not a WordNet noun.");
         }
-        // TODO:
-        return 0;
+        SAP sap = new SAP(wordGraph);
+        SET<Integer> idA = synsets.get(nounA);
+        SET<Integer> idB = synsets.get(nounB);
+
+        return sap.length(idA, idB);
 
     }
 
@@ -145,14 +148,19 @@ public class WordNet {
      *
      * @param nounA
      * @param nounB
-     * @return
+     * @return the common ancestor of nounA and nounB in a shortest ancestral
+     *         path(SAP)
      */
     public String sap(String nounA, String nounB) {
         if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException("Any of the noun arguments in sap() is not a WordNet noun.");
         }
-        // TODO:
-        return "Test";
+        SAP sap = new SAP(wordGraph);
+        SET<Integer> idA = synsets.get(nounA);
+        SET<Integer> idB = synsets.get(nounB);
+        int ancestorId = sap.ancestor(idA, idB);
+
+        return id_nouns.get(ancestorId);
     }
 
     /**
