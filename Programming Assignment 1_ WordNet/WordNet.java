@@ -2,6 +2,7 @@ import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.ST;
+import edu.princeton.cs.algs4.Topological;
 
 /**
  * 
@@ -25,8 +26,9 @@ public class WordNet {
 
     private ST<String, SET<Integer>> synsets;
     private ST<Integer, String> id_nouns;
-    private int num;
     private Digraph wordGraph;
+    private int outSum = 0;                        // the totoal number of out edges
+    private int num = 0;
 
     /**
      * constructor takes the name of the two input files
@@ -44,7 +46,6 @@ public class WordNet {
 
         getSynsets(synsets);
         getHypernyms(hypernyms);
-        int b = 9;
     }
 
     private void getSynsets(String synsets) {
@@ -73,6 +74,7 @@ public class WordNet {
     private void getHypernyms(String hypernyms) {
         In hypernym = new In(hypernyms);
         wordGraph = new Digraph(num);
+        boolean vIsOut[] = new boolean[num];   // does this vertice has an edge out?
         while (hypernym.hasNextLine()) {
             String fields[] = hypernym.readLine().split(",");
             Integer hyponymId = Integer.parseInt(fields[0]);
@@ -81,6 +83,23 @@ public class WordNet {
                 Integer hypernymId = Integer.parseInt(fields[i]);
                 wordGraph.addEdge(hyponymId, hypernymId);
             }
+
+            if (!vIsOut[hyponymId] && fields.length != 1) {
+                outSum++;
+            }
+            vIsOut[hyponymId] = true;
+        }
+        isRootedDAG();
+    }
+
+    private void isRootedDAG(){
+        if (num - outSum!=1){
+            throw new IllegalArgumentException("The input to the constructor does not correspond to a rooted graph");
+        }
+
+        Topological testDAG = new Topological(wordGraph);
+        if (!testDAG.hasOrder()){
+            throw new IllegalArgumentException("The input to the constructor does not correspond to a DAG");
         }
     }
 
