@@ -1,12 +1,9 @@
-import java.util.Iterator;
-
-import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
-import edu.princeton.cs.algs4.BreadthFirstPaths;
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.Queue;
 
 /**
  * Shortest ancestral path({@code SAP}). An ancestral path between two vertices
@@ -18,15 +15,18 @@ import edu.princeton.cs.algs4.StdOut;
  * 
  * @author Li Li
  * @since Apr. 4
- * @version v0.2
+ * @version v1.0
  */
 public class SAP {
 
     private static final int INFINITY = Integer.MAX_VALUE;
     private Digraph graph;
-    private Graph bigraph;
-    private Iterable<Integer> sap;
-    private int destination = -1;
+    private int length_cache = -INFINITY;
+    private int ancestor_cache = -INFINITY;
+    private int v_cache;
+    private int w_cache;
+    private Iterable<Integer> iv_cache;
+    private Iterable<Integer> iw_cache;
 
     /**
      * constructor
@@ -40,24 +40,168 @@ public class SAP {
         }
 
         graph = G;
-        bigraph = toBigraph(graph);
-
     }
 
     /**
-     * Returns the bigraph of the digraph.
-     *
-     * @return the bigraph of the digraph
+     * Returns the ancestor or length of the sap.
+     * 
+     * @param v
+     * @param w
+     * @param flag 0 for ancestor, 1 for length
+     * @return
      */
-    private Graph toBigraph(Digraph G) {
-        Graph bigraph = new Graph(G.V());
-        for (int v = 0; v < G.V(); v++) {
-            for (int w : G.adj(v)) {
-                bigraph.addEdge(v, w);
-                bigraph.addEdge(w, v);
+    private int bfs_sap(int v, int w, int flag) {
+
+        // check if v and w is the same as cache
+        boolean isSame = (v == v_cache && w == w_cache) || (w == v_cache && v == w_cache);
+
+        // use cache for ancestor
+        if (isSame && ancestor_cache != -INFINITY && flag == 0) {
+            return ancestor_cache;
+        }
+
+        // use cache for length
+        if (isSame && length_cache != -INFINITY && flag == 1) {
+            return length_cache;
+        }
+
+        v_cache = v;
+        w_cache = w;
+
+        BreadthFirstDirectedPaths dist2w = new BreadthFirstDirectedPaths(graph, w);// reverse source digraph
+        Queue<Integer> vQueue = new Queue<Integer>();
+        int gV = graph.V();
+        Boolean[] marked = new Boolean[gV];
+        int[] distTo = new int[gV];
+        int minLen = INFINITY;
+        int ancestor = -1;
+
+        for (int i = 0; i < gV; i++) {
+            marked[i] = false;
+            distTo[i] = INFINITY;
+        }
+
+        marked[v] = true;
+        distTo[v] = 0;
+        vQueue.enqueue(v);
+        while (!vQueue.isEmpty()) {
+            int curr = vQueue.dequeue();
+            if (minLen < distTo[curr]) {
+                break;
+            }
+            // if the sum of initial digraph and reverse source digraph is smaller
+            if (dist2w.hasPathTo(curr) && (dist2w.distTo(curr) + distTo[curr] < minLen)) {
+                minLen = dist2w.distTo(curr) + distTo[curr];
+                ancestor = curr;
+            }
+            for (int next : graph.adj(curr)) {
+                // if not visited
+                if (!marked[next]) {
+                    marked[next] = true;
+                    distTo[next] = distTo[curr] + 1;
+                    vQueue.enqueue(next);
+                }
             }
         }
-        return bigraph;
+
+        if (flag == 1) {
+            // return length
+            if (minLen < INFINITY) {
+                length_cache = minLen;
+                return minLen;
+            } else {
+                length_cache = -1;
+                return -1;
+            }
+        } else {
+            // return ancestor
+            length_cache = (minLen < INFINITY) ? minLen : -1;
+            ancestor_cache = ancestor;
+            return ancestor;
+        }
+    }
+
+    /**
+     * Returns the ancestor or length of the sap.
+     * 
+     * @param v    the vertice set of sources
+     * @param w    the vertice set of destination
+     * @param flag 0 for ancestor, 1 for length
+     * @return
+     */
+    private int bfs_sap(Iterable<Integer> v, Iterable<Integer> w, int flag) {
+
+        // check if v and w is the same as cache
+        boolean isSame = (v == iv_cache && w == iw_cache) || (w == iv_cache && v == iw_cache);
+
+        // use cache for ancestor
+        if (isSame && ancestor_cache != -INFINITY && flag == 0) {
+            return ancestor_cache;
+        }
+
+        // use cache for length
+        if (isSame && length_cache != -INFINITY && flag == 1) {
+            return length_cache;
+        }
+
+        iv_cache = v;
+        iw_cache = w;
+
+        BreadthFirstDirectedPaths dist2w = new BreadthFirstDirectedPaths(graph, w);// reverse source digraph
+        Queue<Integer> vQueue = new Queue<Integer>();
+        int gV = graph.V();
+        Boolean[] marked = new Boolean[gV];
+        int[] distTo = new int[gV];
+        int minLen = INFINITY;
+        int ancestor = -1;
+
+        for (int i = 0; i < gV; i++) {
+            marked[i] = false;
+            distTo[i] = INFINITY;
+        }
+
+        // add all the vertice into vQueue
+        for (int vertex : v) {
+            marked[vertex] = true;
+            distTo[vertex] = 0;
+            vQueue.enqueue(vertex);
+        }
+
+        while (!vQueue.isEmpty()) {
+            int curr = vQueue.dequeue();
+            if (minLen < distTo[curr]) {
+                break;
+            }
+            // if the sum of initial digraph and reverse source digraph is smaller
+            if (dist2w.hasPathTo(curr) && (dist2w.distTo(curr) + distTo[curr] < minLen)) {
+                minLen = dist2w.distTo(curr) + distTo[curr];
+                ancestor = curr;
+            }
+            for (int next : graph.adj(curr)) {
+                // if not visited
+                if (!marked[next]) {
+                    marked[next] = true;
+                    distTo[next] = distTo[curr] + 1;
+                    vQueue.enqueue(next);
+                }
+            }
+        }
+
+        if (flag == 1) {
+            // return length
+            if (minLen < INFINITY) {
+                length_cache = minLen;
+                return minLen;
+            } else {
+                length_cache = -1;
+                return -1;
+            }
+        } else {
+            // return ancestor
+            length_cache = (minLen < INFINITY) ? minLen : -1;
+            ancestor_cache = ancestor;
+            return ancestor;
+        }
     }
 
     /**
@@ -75,13 +219,7 @@ public class SAP {
         validateVertex(v, numV);
         validateVertex(w, numV);
 
-        BreadthFirstPaths bfgraph = new BreadthFirstPaths(bigraph, v);
-
-        if (bfgraph.hasPathTo(w)) {
-            return bfgraph.distTo(w);
-        }
-
-        return -1;
+        return bfs_sap(v, w, 1);
 
     }
 
@@ -101,24 +239,7 @@ public class SAP {
         validateVertex(v, numV);
         validateVertex(w, numV);
 
-        BreadthFirstPaths bfgraph = new BreadthFirstPaths(bigraph, v);
-        BreadthFirstDirectedPaths bfdgraph = new BreadthFirstDirectedPaths(graph, v);
-        int vNext = 0;
-        int vthis = 0;
-
-        if (!bfgraph.hasPathTo(w)) {
-            return -1;
-        }
-
-        Iterator<Integer> pathIterator = bfgraph.pathTo(w).iterator();
-        while (pathIterator.hasNext()) {
-            vNext = pathIterator.next();
-            if (!bfdgraph.hasPathTo(vNext)) {
-                return vthis;
-            }
-            vthis = vNext;
-        }
-        return vNext;
+        return bfs_sap(v, w, 0);
 
     }
 
@@ -136,24 +257,9 @@ public class SAP {
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
 
         int numV = graph.V();
-        int min = INFINITY;
         validateVertices(v, numV);
 
-        for (int vitem : v) {
-            BreadthFirstPaths bfgraph = new BreadthFirstPaths(bigraph, vitem);
-
-            for (int witem : w) {
-                int curr = bfgraph.distTo(witem);
-                if (curr < min) {
-                    min = curr;
-                    sap = bfgraph.pathTo(witem);
-                    destination = witem;
-                }
-            }
-        }
-
-        return (min == INFINITY) ? -1 : min;
-
+        return bfs_sap(v, w, 1);
     }
 
     /**
@@ -171,13 +277,8 @@ public class SAP {
 
         int numV = graph.V();
         validateVertices(v, numV);
-        if (sap == null) {
-            length(v, w);
-        }
 
-        int source = sap.iterator().next();
-
-        return ancestor(source, destination);
+        return bfs_sap(v, w, 0);
 
     }
 
@@ -213,27 +314,11 @@ public class SAP {
 
     // do unit testing of this class
     public static void main(String[] args) {
-        In in = new In(args[0]);
+        In in = new In("data/digraph2.txt");
         Digraph G = new Digraph(in);
         SAP sap = new SAP(G);
-        // while (!StdIn.isEmpty()) {
-        // int v = StdIn.readInt();
-        // int w = StdIn.readInt();
-        // int length = sap.length(v, w);
-        // int ancestor = sap.ancestor(v, w);
-        // StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
-        // }
-
-        Bag<Integer> vBag = new Bag<>();
-        Bag<Integer> wBag = new Bag<>();
-        vBag.add(13);
-        vBag.add(23);
-        vBag.add(24);
-        wBag.add(6);
-        wBag.add(16);
-        wBag.add(17);
-        int length = sap.length(vBag, wBag);
-        int ancestor = sap.ancestor(vBag, wBag);
+        int length = sap.length(1, 5);
+        int ancestor = sap.ancestor(1, 5);
         StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
         StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
     }
