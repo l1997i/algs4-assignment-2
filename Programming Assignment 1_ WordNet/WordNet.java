@@ -1,174 +1,137 @@
-import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.SET;
+
 import edu.princeton.cs.algs4.ST;
+import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.Topological;
 
-/**
- * 
- * WordNet is a semantic lexicon for the English language that computational
- * linguists and cognitive scientists use extensively. For example, WordNet was
- * a key component in IBM’s Jeopardy-playing Watson computer system. WordNet
- * groups words into sets of synonyms called synsets. For example, { AND
- * circuit, AND gate } is a synset that represent a logical gate that fires only
- * when all of its inputs fire. WordNet also describes semantic relationships
- * between synsets. One such relationship is the is-a relationship, which
- * connects a hyponym (more specific synset) to a hypernym (more general
- * synset). For example, the synset { gate, logic gate } is a hypernym of { AND
- * circuit, AND gate } because an AND gate is a kind of logic gate.
- * 
- * @author Li Li
- * @since Apr. 2
- * @version v0.2
- * 
- */
 public class WordNet {
-
-    private ST<String, SET<Integer>> synsets;
+    private ST<String, SET<Integer>> synsets; // noun and ids contain the noun
     private ST<Integer, String> id_nouns;
-    private Digraph wordGraph;
-    private int outSum = 0; // the totoal number of out edges
-    private int num = 0;
+    private Digraph hypernyms;
+    private boolean[] outEdge; // is the vertex has a edge out?
+    private int outSum; // the number of vertices having a out edge
+    private int idSum;
+    private SAP sap;
 
-    /**
-     * constructor takes the name of the two input files
-     * 
-     * @param synsets
-     * @param hypernyms
-     * @throws IllegalArgumentException if any argument to the constructor or an
-     *                                  instance method is null
-     */
+    // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
-
         if (synsets == null || hypernyms == null) {
-            throw new IllegalArgumentException("Any argument to the constructor or an instance method is null");
+            throw new IllegalArgumentException("arguments to WordNet() is null");
         }
 
-        getSynsets(synsets);
-        getHypernyms(hypernyms);
+        readSynsets(synsets);
+        readHypernyms(hypernyms);
     }
 
-    private void getSynsets(String synsets) {
+    // build ST<String, SET<Integer>> synsets
+    private void readSynsets(String synsets) {
         this.synsets = new ST<String, SET<Integer>>();
         id_nouns = new ST<Integer, String>();
         In synset = new In(synsets);
         while (synset.hasNextLine()) {
-            String fields[] = synset.readLine().split(",");
-            String nounSET[] = fields[1].split(" ");
-            Integer subID;
-            num++;
-            subID = Integer.parseInt(fields[0]);
-            id_nouns.put(subID, fields[1]);
-            for (String noun : nounSET) {
-                if (this.synsets.contains(noun)) {
-                    this.synsets.get(noun).add(subID);
+            idSum++;
+            String str = synset.readLine();
+            String[] fields = str.split(",");
+            int id = Integer.parseInt(fields[0]);
+            id_nouns.put(id, fields[1]);
+            String[] nouns = fields[1].split(" ");
+            for (int i = 0; i < nouns.length; i++) {
+                if (this.synsets.contains(nouns[i])) {
+                    this.synsets.get(nouns[i]).add(id);
                 } else {
                     SET<Integer> ids = new SET<Integer>();
-                    ids.add(subID);
-                    this.synsets.put(noun, ids);
+                    ids.add(id);
+                    this.synsets.put(nouns[i], ids);
                 }
             }
         }
     }
 
-    private void getHypernyms(String hypernyms) {
+    // build Digraph hypernyms
+    private void readHypernyms(String hypernyms) {
+        this.hypernyms = new Digraph(idSum);
         In hypernym = new In(hypernyms);
-        wordGraph = new Digraph(num);
-        boolean vIsOut[] = new boolean[num]; // does this vertice has an edge out?
+        outEdge = new boolean[idSum];
         while (hypernym.hasNextLine()) {
-            String fields[] = hypernym.readLine().split(",");
-            Integer hyponymId = Integer.parseInt(fields[0]);
-
-            for (int i = 1; i < fields.length - 1; i++) {
-                Integer hypernymId = Integer.parseInt(fields[i]);
-                wordGraph.addEdge(hyponymId, hypernymId);
+            String str = hypernym.readLine();
+            String[] fields = str.split(",");
+            int v = Integer.parseInt(fields[0]);
+            for (int i = 1; i < fields.length; i++) {
+                int w = Integer.parseInt(fields[i]);
+                this.hypernyms.addEdge(v, w);
             }
-
-            if (!vIsOut[hyponymId] && fields.length != 1) {
+            if (!outEdge[v] && fields.length != 1) {
                 outSum++;
             }
-            vIsOut[hyponymId] = true;
+            outEdge[v] = true;
         }
         isRootedDAG();
+        sap = new SAP(this.hypernyms);
     }
 
     private void isRootedDAG() {
-        if (num - outSum != 1) {
-            throw new IllegalArgumentException("The input to the constructor does not correspond to a rooted graph");
+        if (idSum - outSum != 1) {
+            throw new IllegalArgumentException("is not a one root digraph");
         }
-
-        Topological testDAG = new Topological(wordGraph);
-        if (!testDAG.hasOrder()) {
-            throw new IllegalArgumentException("The input to the constructor does not correspond to a DAG");
+        Topological topo = new Topological(hypernyms);
+        if (!topo.hasOrder()) {
+            throw new IllegalArgumentException("is not a DAG");
         }
     }
 
-    /**
-     * returns all WordNet nouns
-     * 
-     * @return all WordNet nouns
-     */
+    // returns all WordNet nouns
     public Iterable<String> nouns() {
         return synsets.keys();
     }
 
-    /**
-     * is the word a WordNet noun?
-     * 
-     * @param word
-     * @return
-     */
+    // is the word a WordNet noun?
     public boolean isNoun(String word) {
+        if (word == null) {
+            throw new IllegalArgumentException("arguments to isNoun() is null");
+        }
         return synsets.contains(word);
-
     }
 
-    /**
-     * distance between nounA and nounB
-     *
-     * @param nounA
-     * @param nounB
-     * @return distance between nounA and nounB
-     */
+    // distance between nounA and nounB (defined below)
     public int distance(String nounA, String nounB) {
-        if (!isNoun(nounA) || !isNoun(nounB)) {
-            throw new IllegalArgumentException("Any of the noun arguments in distance() is not a WordNet noun.");
+        if (nounA == null || nounB == null) {
+            throw new IllegalArgumentException("arguments to distance() is null");
         }
-        SAP sap = new SAP(wordGraph);
-        SET<Integer> idA = synsets.get(nounA);
-        SET<Integer> idB = synsets.get(nounB);
-
-        return sap.length(idA, idB);
-
+        if (!isNoun(nounA) || !isNoun(nounB)) {
+            throw new IllegalArgumentException("arguments to distance() is not a WordNet noun");
+        }
+        SET<Integer> setA = synsets.get(nounA);
+        SET<Integer> setB = synsets.get(nounB);
+        if (setA.size() == 1 && setB.size() == 1) {
+            return sap.length(setA.max(), setB.max());
+        } else {
+            return sap.length(setA, setB);
+        }
     }
 
-    /**
-     * a synset (second field of synsets.txt) that is the common ancestor of nounA
-     * and nounB in a shortest ancestral path
-     *
-     * @param nounA
-     * @param nounB
-     * @return the common ancestor of nounA and nounB in a shortest ancestral
-     *         path(SAP)
-     */
+    // a synset (second field of synsets.txt) that is the common ancestor of nounA
+    // and nounB
+    // in a shortest ancestral path (defined below)
     public String sap(String nounA, String nounB) {
-        if (!isNoun(nounA) || !isNoun(nounB)) {
-            throw new IllegalArgumentException("Any of the noun arguments in sap() is not a WordNet noun.");
+        if (nounA == null || nounB == null) {
+            throw new IllegalArgumentException("arguments to sap() is null");
         }
-        SAP sap = new SAP(wordGraph);
-        SET<Integer> idA = synsets.get(nounA);
-        SET<Integer> idB = synsets.get(nounB);
-        int ancestorId = sap.ancestor(idA, idB);
-
-        return id_nouns.get(ancestorId);
+        if (!isNoun(nounA) || !isNoun(nounB)) {
+            throw new IllegalArgumentException("arguments to sap() is not a WordNet noun");
+        }
+        int id;
+        SET<Integer> setA = synsets.get(nounA);
+        SET<Integer> setB = synsets.get(nounB);
+        if (setA.size() == 1 && setB.size() == 1) {
+            id = sap.ancestor(setA.max(), setB.max());
+        } else {
+            id = sap.ancestor(setA, setB);
+        }
+        return id_nouns.get(id);
     }
 
-    /**
-     * do unit testing of this class
-     * 
-     * @param args
-     */
+    // do unit testing of this class
     public static void main(String[] args) {
-        WordNet test = new WordNet("data/synsets.txt", "data/hypernyms.txt");
     }
 }

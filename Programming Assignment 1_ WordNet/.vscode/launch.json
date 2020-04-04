@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "type": "java",
             "name": "Debug (Launch) - Current File",
@@ -20,9 +19,16 @@
         },
         {
             "type": "java",
-            "name": "Test",
+            "name": "Outcast",
             "request": "launch",
-            "mainClass": "utest",
+            "mainClass": "Outcast",
+            "args": [
+                "data/synsets.txt",
+                "data/hypernyms.txt",
+                "data/outcast5.txt",
+                "data/outcast8.txt",
+                "data/outcast11.txt",
+            ]
         },
     ]
 }
