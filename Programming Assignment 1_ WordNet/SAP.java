@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
-import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.Queue;
@@ -23,6 +22,8 @@ public class SAP {
     private Digraph graph;
     private int length_cache = -INFINITY;
     private int ancestor_cache = -INFINITY;
+    private int ilength_cache = -INFINITY;
+    private int iancestor_cache = -INFINITY;
     private int v_cache;
     private int w_cache;
     private Iterable<Integer> iv_cache;
@@ -39,7 +40,7 @@ public class SAP {
             throw new IllegalArgumentException("Argument is null");
         }
 
-        graph = G;
+        graph = new Digraph(G);
     }
 
     /**
@@ -104,6 +105,7 @@ public class SAP {
             }
         }
 
+        ancestor_cache = ancestor;
         if (flag == 1) {
             // return length
             if (minLen < INFINITY) {
@@ -116,7 +118,6 @@ public class SAP {
         } else {
             // return ancestor
             length_cache = (minLen < INFINITY) ? minLen : -1;
-            ancestor_cache = ancestor;
             return ancestor;
         }
     }
@@ -135,13 +136,13 @@ public class SAP {
         boolean isSame = (v == iv_cache && w == iw_cache) || (w == iv_cache && v == iw_cache);
 
         // use cache for ancestor
-        if (isSame && ancestor_cache != -INFINITY && flag == 0) {
-            return ancestor_cache;
+        if (isSame && iancestor_cache != -INFINITY && flag == 0) {
+            return iancestor_cache;
         }
 
         // use cache for length
-        if (isSame && length_cache != -INFINITY && flag == 1) {
-            return length_cache;
+        if (isSame && ilength_cache != -INFINITY && flag == 1) {
+            return ilength_cache;
         }
 
         iv_cache = v;
@@ -187,19 +188,19 @@ public class SAP {
             }
         }
 
+        iancestor_cache = ancestor;
         if (flag == 1) {
             // return length
             if (minLen < INFINITY) {
-                length_cache = minLen;
+                ilength_cache = minLen;
                 return minLen;
             } else {
-                length_cache = -1;
+                ilength_cache = -1;
                 return -1;
             }
         } else {
             // return ancestor
-            length_cache = (minLen < INFINITY) ? minLen : -1;
-            ancestor_cache = ancestor;
+            ilength_cache = (minLen < INFINITY) ? minLen : -1;
             return ancestor;
         }
     }
@@ -258,6 +259,7 @@ public class SAP {
 
         int numV = graph.V();
         validateVertices(v, numV);
+        validateVertices(w, numV);
 
         return bfs_sap(v, w, 1);
     }
@@ -277,6 +279,7 @@ public class SAP {
 
         int numV = graph.V();
         validateVertices(v, numV);
+        validateVertices(w, numV);
 
         return bfs_sap(v, w, 0);
 
@@ -305,8 +308,8 @@ public class SAP {
         if (vertices == null) {
             throw new IllegalArgumentException("argument is null");
         }
-        for (int v : vertices) {
-            if (v < 0 || v >= V) {
+        for (Integer v : vertices) {
+            if (v == null || v < 0 || v >= V) {
                 throw new IllegalArgumentException("vertex " + v + " is not between 0 and " + (V - 1));
             }
         }
@@ -317,9 +320,35 @@ public class SAP {
         In in = new In("data/digraph2.txt");
         Digraph G = new Digraph(in);
         SAP sap = new SAP(G);
-        int length = sap.length(1, 5);
-        int ancestor = sap.ancestor(1, 5);
-        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
-        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
+
+        Queue<Integer> v = new Queue<>();
+        v.enqueue(5);
+        v.enqueue(3);
+        v.enqueue(1);
+
+        Queue<Integer> w = new Queue<>();
+        w.enqueue(2);
+        w.enqueue(3);
+        w.enqueue(4);
+
+        int ancestor1 = sap.ancestor(2, 5);
+        StdOut.printf("ancestor = %d\n", ancestor1);
+
+        // Test cache for many times
+        int ancestor2 = sap.ancestor(v, w);
+        StdOut.printf("ancestor = %d\n", ancestor2);
+        ancestor2 = sap.ancestor(v, w);
+        StdOut.printf("ancestor = %d\n", ancestor2);
+        ancestor1 = sap.ancestor(2, 5);
+        StdOut.printf("ancestor = %d\n", ancestor1);
+        ancestor1 = sap.ancestor(2, 5);
+        StdOut.printf("ancestor = %d\n", ancestor1);
+        ancestor2 = sap.ancestor(v, w);
+        StdOut.printf("ancestor = %d\n", ancestor2);
+        ancestor1 = sap.ancestor(2, 5);
+        StdOut.printf("ancestor = %d\n", ancestor1);
+        ancestor2 = sap.ancestor(v, w);
+        StdOut.printf("ancestor = %d\n", ancestor2);
+
     }
 }
