@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "SeamCarver",
+            "request": "launch",
+            "mainClass": "SeamCarver",
+            
+        },
+        {
+            "type": "java",
+            "name": "ShowSeams",
+            "request": "launch",
+            "mainClass": "ShowSeams",
+            "args": "/Users/l1997i/Desktop/algs4-assignment-2/2_Seam_Carving/data/chameleon.png"
+            
+        }
+    ]
+}
