@@ -9,7 +9,6 @@
             "name": "SeamCarver",
             "request": "launch",
             "mainClass": "SeamCarver",
-            
         },
         {
             "type": "java",
@@ -17,7 +16,17 @@
             "request": "launch",
             "mainClass": "ShowSeams",
             "args": "/Users/l1997i/Desktop/algs4-assignment-2/2_Seam_Carving/data/chameleon.png"
-            
+        },
+        {
+            "type": "java",
+            "name": "ResizeDemo",
+            "request": "launch",
+            "mainClass": "ResizeDemo",
+            "args": [
+                "/Users/l1997i/Desktop/algs4-assignment-2/2_Seam_Carving/data/chameleon.png",
+                "80",
+                "80",
+            ]
         }
     ]
 }

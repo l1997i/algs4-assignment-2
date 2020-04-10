@@ -27,7 +27,7 @@ import edu.princeton.cs.algs4.Topological;
  * 
  * @author Li Li
  * @since Apr. 9, 2020
- * @version 0.0.2
+ * @version 0.1.0
  */
 public class SeamCarver {
     private Picture picture;
@@ -53,7 +53,10 @@ public class SeamCarver {
      * @return current picture
      */
     public Picture picture() {
-        return picture;
+        // create a new Picture so that client can mutate the Picture object that is
+        // returned by picture()
+        Picture resPic = new Picture(this.picture);
+        return resPic;
     }
 
     /**
@@ -166,6 +169,7 @@ public class SeamCarver {
             }
         }
 
+        // topological sort
         for (int v : energyTopological.order()) {
             int[] index_v = getxy(v);
             double energy_v = energy(index_v[0], index_v[1]);
@@ -176,16 +180,16 @@ public class SeamCarver {
                     break;
                 }
                 int[] index_w = getxy(w);
+
+                // update the minimum energy to get to pixel v
                 if (curr_energy + energy[index_w[0]][index_w[1]] < energy[index_v[0]][index_v[1]]) {
-                    // StdOut.println("v: " + v + "(" + curr_energy + ") \t\t\t\t<- w: " + w + "("
-                    // + energy[index_w[0]][index_w[1]] + ")\t\t\t\t = "
-                    // + (curr_energy + energy[index_w[0]][index_w[1]]));
                     energy[index_v[0]][index_v[1]] = curr_energy + energy[index_w[0]][index_w[1]];
                     from[v] = w;
                 }
             }
         }
 
+        // find the minimum energy in the last row
         double energyMin = Double.POSITIVE_INFINITY;
         int vertexMin = 0;
         int[] seam = new int[height];
@@ -197,6 +201,7 @@ public class SeamCarver {
             }
         }
 
+        // convert the from[] array into seam[] format
         aux[height - 1] = vertexMin;
         seam[height - 1] = vertexMin % width;
         for (int j = height - 2; j >= 0; j--) {
@@ -242,6 +247,20 @@ public class SeamCarver {
         int nextIndexA = isVertical ? width : 1;
         int nextIndexB;
 
+        if (width == 1) {
+            for (int i = 0; i < height - 1; i++) {
+                energyGraph.addEdge(i, i + 1);
+            }
+            return energyGraph;
+        }
+
+        if (height == 1) {
+            for (int i = 0; i < width - 1; i++) {
+                energyGraph.addEdge(i, i + 1);
+            }
+            return energyGraph;
+        }
+
         nextIndexB = width + 1;
         for (int i = 0, j = 0; j < maxLoop - 1; i += nextIndexA) {
             energyGraph.addEdge(i, i + nextIndexA);
@@ -282,6 +301,34 @@ public class SeamCarver {
         return energyGraph;
     }
 
+    private Picture removeSeam(int[] seam, boolean isVertical) {
+        if (isVertical) {
+            Picture p = new Picture(width() - 1, height());
+            for (int y = 0; y < height(); y++) {
+                int k = 0;
+                for (int x = 0; x < width(); x++) {
+                    if (x != seam[y]) {
+                        p.set(k, y, picture.get(x, y));
+                        k++;
+                    }
+                }
+            }
+            return p;
+        }
+
+        Picture p = new Picture(width(), height() - 1);
+        for (int y = 0; y < width(); y++) {
+            int k = 0;
+            for (int x = 0; x < height(); x++) {
+                if (x != seam[y]) {
+                    p.set(y, k, picture.get(y, x));
+                    k++;
+                }
+            }
+        }
+        return p;
+    }
+
     /**
      * remove horizontal seam from current picture
      * 
@@ -293,13 +340,16 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
 
         /** Corner cases **/
+
         if (seam == null || height() <= 1)
             throw new IllegalArgumentException(
                     "called with a null argument or called when the height of the picture is less than or equal to 1");
+        if (seam.length != width())
+            throw new IllegalArgumentException("the length of the seam should equal to width");
         if (!isValidSeam(seam, false))
             throw new IllegalArgumentException("seam illegal");
 
-        // TODO:
+        picture = removeSeam(seam, false);
 
     }
 
@@ -314,25 +364,16 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
 
         /** Corner cases **/
-        if (seam == null || width() <= 1) {
+
+        if (seam == null || width() <= 1)
             throw new IllegalArgumentException(
                     "called with a null argument or called when the width of the picture is less than or equal to 1");
-        }
+        if (seam.length != height())
+            throw new IllegalArgumentException("the length of the seam should equal to height");
         if (!isValidSeam(seam, true))
             throw new IllegalArgumentException("seam illegal");
 
-        int width = width();
-        int height = height();
-        for (int i = 0; i < height; i++) {
-            int seam_i = seam[i];
-            for (int j = 0; j < width - 1; j++) {
-                if (j != seam_i)
-                    picture.set(i, j, picture.get(i, j));
-                else
-                    j--;
-            }
-        }
-
+        picture = removeSeam(seam, true);
     }
 
     /**
@@ -392,11 +433,8 @@ public class SeamCarver {
 
     // unit testing
     public static void main(String[] args) {
-
-        // TODO:
-
-        Picture picture = new Picture(
-                "/Users/l1997i/Desktop/algs4-assignment-2/2_Seam_Carving/data/3x7.png");
+        
+        Picture picture = new Picture("/Users/l1997i/Desktop/algs4-assignment-2/2_Seam_Carving/data/1x8.png");
         SeamCarver seamPicture = new SeamCarver(picture);
         StdOut.println(picture.width());
         StdOut.println(picture.height());
@@ -417,6 +455,9 @@ public class SeamCarver {
 
         int[] a = seamPicture.findVerticalSeam();
         int[] b = seamPicture.findHorizontalSeam();
+        Picture c = seamPicture.picture();
+        Picture d = seamPicture.picture();
+        Picture e = seamPicture.picture();
         StdOut.print("\n");
     }
 }
