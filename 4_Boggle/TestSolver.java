@@ -8,10 +8,10 @@ public class TestSolver {
     @Test
     public void testBoggleSolver() {
         printHeader("testBoggleSolver");
-        In in = new In("data/dictionary-shakespeare.txt");
+        In in = new In("data/dictionary-algs4.txt");
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
-        BoggleBoard board = new BoggleBoard();
+        BoggleBoard board = new BoggleBoard("data/board4x4.txt");
         for (String s : solver.getAllValidWords(board)) {
             StdOut.println(s);
         }
