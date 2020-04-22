@@ -1,3 +1,6 @@
+import edu.princeton.cs.algs4.Alphabet;
+import edu.princeton.cs.algs4.Bag;
+
 /**
  * The Boggle game. Boggle is a word game designed by Allan Turoff and
  * distributed by Hasbro. It involves a board made up of 16 cubic dice, where
@@ -15,6 +18,9 @@
 public class BoggleSolver {
 
     private BoggleDict dict;
+    private boolean[] marked;
+    private int[] edgeTo;
+    private Bag<String> validWords = new Bag<>();
 
     /**
      * Initializes the data structure using the given array of strings as the
@@ -27,6 +33,28 @@ public class BoggleSolver {
         dict = new BoggleDict(dictionary);
     }
 
+    private static class Die {
+        public final int row;
+        public final int col;
+
+        public Die(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+
+        public String toString() {
+            return "(" + row + ", " + col + ")";
+        }
+
+        public boolean isValid(int boardRows, int boardCols) {
+            if (row >= boardRows || row < 0 || col >= boardCols || col < 0) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+
     /**
      * Returns the set of all valid words in the given Boggle board, as an Iterable.
      * 
@@ -36,7 +64,65 @@ public class BoggleSolver {
     public Iterable<String> getAllValidWords(BoggleBoard board) {
         // TODO:
 
-        return dict.keysWithPrefix("ABAND");
+        final int rows = board.rows();
+        final int cols = board.cols();
+        final int SIZE = cols * rows;
+        marked = new boolean[SIZE];
+        edgeTo = new int[SIZE];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Die root = new Die(i, j);
+                char l = board.getLetter(i, j);
+                String word = new String();
+                word += l;
+                getAllValidWords(board, root, word);
+            }
+        }
+
+        return validWords;
+    }
+
+    private boolean isInDict(String word) {
+        return dict.contains(word);
+    }
+
+    private void getAllValidWords(BoggleBoard board, Die d, String word) {
+
+        if (word.length() > 2 && isInDict(word)) {
+            validWords.add(word);
+        }
+
+        int idx = toIndex(board, d.row, d.col);
+        marked[idx] = true;
+        for (Die nbr : neighbor(board, d.row, d.col)) {
+            int idx_nbr = toIndex(board, nbr.row, nbr.col);
+            if (!marked[idx_nbr]) {
+                word += board.getLetter(nbr.row, nbr.row);
+                getAllValidWords(board, nbr, word);
+            }
+        }
+    }
+
+    private int toIndex(BoggleBoard board, int row, int col) {
+        int boardCols = board.cols();
+        return row * boardCols + col;
+    }
+
+    private Iterable<Die> neighbor(BoggleBoard board, int r, int c) {
+        Bag<Die> retBag = new Bag<>();
+        int boardCols = board.cols();
+        int boardRows = board.rows();
+
+        for (int offset_r = -1; offset_r <= 1; offset_r++) {
+            for (int offset_c = -1; offset_c <= 1; offset_c++) {
+                Die d = new Die(r + offset_r, c + offset_c);
+                if (!(offset_r == 0 && offset_c == 0) && d.isValid(boardRows, boardCols)) {
+                    retBag.add(d);
+                }
+            }
+        }
+
+        return retBag;
     }
 
     /**
