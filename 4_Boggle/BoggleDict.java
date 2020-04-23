@@ -1,65 +1,36 @@
-import java.util.HashMap;
-import edu.princeton.cs.algs4.TST;
-
+/**
+ * Build a
+ */
 public class BoggleDict {
 
-    private final HashMap<String, TST<Integer>> dictionary;
+    private static final int R = 26; // only contains A-Z
 
-    /*
-     * Initializes an empty string symbol table.
-     */
-    public BoggleDict(String[] dictionary) {
-        this.dictionary = new HashMap<>();
+    private Node root; // root of trie
 
-        for (String w : dictionary) {
-            if (w.length() > 2) {
-                String key = word2key(w);
-                if (!this.dictionary.containsKey(key)) {
-                    // Create TST for the key
-                    this.dictionary.put(key, new TST<Integer>());
-                }
-                this.dictionary.get(key).put(w.substring(2), w.length());
-            }
-        }
+    // R-way trie node
+    private static class Node {
+        private Node[] next = new Node[R];
+        private boolean isValid;
     }
 
     /**
-     * Returns all of the keys in the set that start with {@code prefix}.
+     * initializes a string symbol table with given String[] dictionary
      * 
-     * @param prefix the prefix
-     * @return all of the keys in the set that start with {@code prefix}, as an
-     *         iterable
+     * @param dictionary
      */
-    public Iterable<String> keysWithPrefix(String prefix) {
-        String key = word2key(prefix);
-        if (!dictionary.containsKey(key)) {
-            return null;
+    public BoggleDict(String[] dictionary) {
+
+        for (String word : dictionary) {
+            put(word);
         }
-        return dictionary.get(key).keysWithPrefix(prefix.substring(2));
     }
 
     public boolean containsPrefix(String prefix) {
-        if (prefix.length() == 1) {
-            char[] c = { prefix.charAt(0), 'A' };
-            while (c[1] <= 'Z') {
-                if (dictionary.containsKey(String.valueOf(c))) {
-                    return true;
-                }
-                c[1]++;
-            }
+        Node x = get(root, prefix.toString(), 0);
+        if (x != null)
+            return true;
+        else
             return false;
-        }
-        if (prefix.length() == 2) {
-            return dictionary.containsKey(prefix);
-        }
-
-        else {
-            String key = word2key(prefix);
-            if (!dictionary.containsKey(key)) {
-                return false;
-            }
-            return dictionary.get(key).keysWithPrefix(prefix.substring(2)).iterator().hasNext();
-        }
 
     }
 
@@ -71,21 +42,53 @@ public class BoggleDict {
      *         {@code false} otherwise
      * @throws IllegalArgumentException if {@code word} is {@code null}
      */
-    public boolean contains(String word) {
-        if (word.length() < 2) {
+    public boolean contains(StringBuilder word) {
+        Node x = get(root, word.toString(), 0);
+        if (x == null)
             return false;
-        }
-        if (word.length() == 2) {
-            return dictionary.containsKey(word);
-        }
-        String key = word2key(word);
-        if (!dictionary.containsKey(key)) {
-            return false;
-        }
-        return dictionary.get(key).contains(word.substring(2));
+        return x.isValid;
     }
 
-    private String word2key(String word) {
-        return String.valueOf(word.charAt(0)) + String.valueOf(word.charAt(1));
+    public boolean contains(String word) {
+        Node x = get(root, word, 0);
+        if (x == null)
+            return false;
+        return x.isValid;
+    }
+
+    /**
+     * Add the given word to the dictionary
+     * @param word
+     */
+    public void put(String word) {
+        root = put(root, word, 0);
+    }
+
+    private Node put(Node x, String word, int d) {
+        if (x == null)
+            x = new Node();
+        if (d == word.length()) {
+            x.isValid = true;
+        } else {
+            char c = word.charAt(d);
+            x.next[c - 'A'] = put(x.next[c - 'A'], word, d + 1);
+        }
+        return x;
+    }
+
+    /**
+     * Get the word begining from {@code Node} x
+     * @param x
+     * @param word
+     * @param d
+     * @return the word you get
+     */
+    private Node get(Node x, String word, int d) {
+        if (x == null)
+            return null;
+        if (d == word.length())
+            return x;
+        char c = word.charAt(d);
+        return get(x.next[c - 'A'], word, d + 1);
     }
 }
