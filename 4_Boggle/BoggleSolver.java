@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.StdOut;
 
 /**
@@ -19,8 +20,8 @@ import edu.princeton.cs.algs4.StdOut;
 public class BoggleSolver {
 
     private BoggleDict dict;
-    private boolean[] marked;
-    private Bag<String> validWords = new Bag<>();
+    private boolean[][] marked;
+    private SET<String> validWords = new SET<>();
 
     /**
      * Initializes the data structure using the given array of strings as the
@@ -66,8 +67,7 @@ public class BoggleSolver {
 
         final int rows = board.rows();
         final int cols = board.cols();
-        final int SIZE = cols * rows;
-        marked = new boolean[SIZE];
+        marked = new boolean[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Die root = new Die(i, j);
@@ -83,29 +83,31 @@ public class BoggleSolver {
 
     private void getAllValidWords(BoggleBoard board, Die d, String word) {
 
+        // add valid word
         if (word.length() > 2 && isInDict(word)) {
             validWords.add(word);
         }
 
-        int idx = toIndex(board, d.row, d.col);
-        marked[idx] = true;
-        for (Die nbr : neighbor(board, d.row, d.col)) {
-            int idx_nbr = toIndex(board, nbr.row, nbr.col);
-            if (!marked[idx_nbr]) {
-                word += board.getLetter(nbr.row, nbr.row);
-                getAllValidWords(board, nbr, word);
+        // backtracking optimization: when the current path corresponds to a string that
+        // is not a prefix of any word in the dictionary, there is no need to expand the
+        // path further
+        if (dict.containsPrefix(word)) {
+            // dfs
+            marked[d.row][d.col] = true;
+            for (Die nbr : neighbor(board, d.row, d.col)) {
+
+                if (!marked[nbr.row][nbr.col]) {
+                    char next = board.getLetter(nbr.row, nbr.col);
+                    getAllValidWords(board, nbr, word + next);
+                }
             }
+            marked[d.row][d.col] = false; // unmark the die as unvisited
         }
-        marked[idx] = false;
+
     }
 
     private boolean isInDict(String word) {
         return dict.contains(word);
-    }
-
-    private int toIndex(BoggleBoard board, int row, int col) {
-        int boardCols = board.cols();
-        return row * boardCols + col;
     }
 
     private Iterable<Die> neighbor(BoggleBoard board, int r, int c) {
@@ -152,9 +154,6 @@ public class BoggleSolver {
         StdOut.println("ABANDONED ? " + solver.isInDict("ABANDONED"));
         StdOut.println("EQUATIONS ? " + solver.isInDict("EQUATIONS"));
         StdOut.println("NOTINIT ? " + solver.isInDict("NOTINIT"));
-
-        StdOut.println("(1, 1): " + solver.toIndex(board, 1, 1));
-        StdOut.println("(2, 3): " + solver.toIndex(board, 2, 3));
     }
 
 }
