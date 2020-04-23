@@ -21,7 +21,8 @@ public class BoggleSolver {
 
     private BoggleDict dict;
     private boolean[][] marked;
-    private SET<String> validWords = new SET<>();
+    private SET<String> validWords;
+    private BoggleBoard board;
 
     /**
      * Initializes the data structure using the given array of strings as the
@@ -64,6 +65,9 @@ public class BoggleSolver {
      */
     public Iterable<String> getAllValidWords(BoggleBoard board) {
 
+        this.board = board;
+        this.validWords = new SET<>();
+
         final int rows = board.rows();
         final int cols = board.cols();
         marked = new boolean[rows][cols];
@@ -74,11 +78,11 @@ public class BoggleSolver {
                 if (first_l == 'Q') {
                     String word = new String();
                     word += "QU";
-                    getAllValidWords(board, root, word);
+                    getAllValidWords(root, word);
                 } else {
                     String word = new String();
                     word += first_l;
-                    getAllValidWords(board, root, word);
+                    getAllValidWords(root, word);
                 }
 
             }
@@ -87,7 +91,7 @@ public class BoggleSolver {
         return validWords;
     }
 
-    private void getAllValidWords(BoggleBoard board, Die d, String word) {
+    private void getAllValidWords(Die d, String word) {
 
         // add valid word
         if (word.length() > 2 && isInDict(word)) {
@@ -100,15 +104,15 @@ public class BoggleSolver {
         if (dict.containsPrefix(word)) {
             // dfs
             marked[d.row][d.col] = true;
-            for (Die nbr : neighbor(board, d.row, d.col)) {
+            for (Die nbr : neighbor(d.row, d.col)) {
 
                 if (!marked[nbr.row][nbr.col]) {
                     char next = board.getLetter(nbr.row, nbr.col);
 
                     if (next == 'Q') {
-                        getAllValidWords(board, nbr, word + "QU");
+                        getAllValidWords(nbr, word + "QU");
                     } else {
-                        getAllValidWords(board, nbr, word + next);
+                        getAllValidWords(nbr, word + next);
                     }
 
                 }
@@ -122,7 +126,7 @@ public class BoggleSolver {
         return dict.contains(word);
     }
 
-    private Iterable<Die> neighbor(BoggleBoard board, int r, int c) {
+    private Iterable<Die> neighbor(int r, int c) {
         Bag<Die> retBag = new Bag<>();
         int boardCols = board.cols();
         int boardRows = board.rows();
@@ -185,7 +189,7 @@ public class BoggleSolver {
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
         BoggleBoard board = new BoggleBoard("data/board4x4.txt");
-        for (Die d : solver.neighbor(board, 2, 2)) {
+        for (Die d : solver.neighbor(2, 2)) {
             StdOut.println(d);
         }
 
