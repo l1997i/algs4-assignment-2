@@ -1,5 +1,10 @@
 /**
- * Build a
+ * Use a trie to store the dictionary. This is the aux class for
+ * {@code BoggleSolver} class.
+ * 
+ * @author Li Li
+ * @since Apr. 23, 2020
+ * 
  */
 public class BoggleDict {
 
@@ -42,12 +47,6 @@ public class BoggleDict {
      *         {@code false} otherwise
      * @throws IllegalArgumentException if {@code word} is {@code null}
      */
-    public boolean contains(StringBuilder word) {
-        Node x = get(root, word.toString(), 0);
-        if (x == null)
-            return false;
-        return x.isValid;
-    }
 
     public boolean contains(String word) {
         Node x = get(root, word, 0);
@@ -58,6 +57,7 @@ public class BoggleDict {
 
     /**
      * Add the given word to the dictionary
+     * 
      * @param word
      */
     public void put(String word) {
@@ -78,6 +78,7 @@ public class BoggleDict {
 
     /**
      * Get the word begining from {@code Node} x
+     * 
      * @param x
      * @param word
      * @param d
