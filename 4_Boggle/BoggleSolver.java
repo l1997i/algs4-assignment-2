@@ -63,17 +63,24 @@ public class BoggleSolver {
      * @return
      */
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        
+
         final int rows = board.rows();
         final int cols = board.cols();
         marked = new boolean[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Die root = new Die(i, j);
-                char l = board.getLetter(i, j);
-                String word = new String();
-                word += l;
-                getAllValidWords(board, root, word);
+                char first_l = board.getLetter(i, j);
+                if (first_l == 'Q') {
+                    String word = new String();
+                    word += "QU";
+                    getAllValidWords(board, root, word);
+                } else {
+                    String word = new String();
+                    word += first_l;
+                    getAllValidWords(board, root, word);
+                }
+
             }
         }
 
