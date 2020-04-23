@@ -6,17 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "CodeLens (Launch) - BoggleSolver",
+            "name": "BoggleSolver",
             "request": "launch",
             "mainClass": "BoggleSolver",
-            "projectName": "4_Boggle_78c575e9"
         },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-BoggleBoard<4_Boggle_78c575e9>",
-            "request": "launch",
-            "mainClass": "BoggleBoard",
-            "projectName": "4_Boggle_78c575e9"
-        }
     ]
 }
