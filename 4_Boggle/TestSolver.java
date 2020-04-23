@@ -35,6 +35,21 @@ public class TestSolver {
         printFooter("testBoggleBoard");
     }
 
+    @Test
+    public void testHasbroBoard() {
+        printHeader("Hasbro board");
+        BoggleBoard board1 = new BoggleBoard("data/testRandom.txt");
+        In in = new In("data/dictionary-yawl.txt");
+        String[] dictionary = in.readAllStrings();
+        BoggleSolver solver = new BoggleSolver(dictionary);
+        StdOut.println(board1);
+        StdOut.println();
+        for (String s : solver.getAllValidWords(board1)) {
+            StdOut.println(s);
+        }
+        printFooter("Hasbro board");
+    }
+
     private void printHeader(String funcName) {
         StdOut.println("=========== " + funcName + " begins ===========");
     }
