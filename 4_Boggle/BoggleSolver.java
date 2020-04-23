@@ -1,5 +1,6 @@
-import edu.princeton.cs.algs4.Alphabet;
 import edu.princeton.cs.algs4.Bag;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
 /**
  * The Boggle game. Boggle is a word game designed by Allan Turoff and
@@ -19,7 +20,6 @@ public class BoggleSolver {
 
     private BoggleDict dict;
     private boolean[] marked;
-    private int[] edgeTo;
     private Bag<String> validWords = new Bag<>();
 
     /**
@@ -68,7 +68,6 @@ public class BoggleSolver {
         final int cols = board.cols();
         final int SIZE = cols * rows;
         marked = new boolean[SIZE];
-        edgeTo = new int[SIZE];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Die root = new Die(i, j);
@@ -80,10 +79,6 @@ public class BoggleSolver {
         }
 
         return validWords;
-    }
-
-    private boolean isInDict(String word) {
-        return dict.contains(word);
     }
 
     private void getAllValidWords(BoggleBoard board, Die d, String word) {
@@ -101,6 +96,11 @@ public class BoggleSolver {
                 getAllValidWords(board, nbr, word);
             }
         }
+        marked[idx] = false;
+    }
+
+    private boolean isInDict(String word) {
+        return dict.contains(word);
     }
 
     private int toIndex(BoggleBoard board, int row, int col) {
@@ -137,6 +137,24 @@ public class BoggleSolver {
 
         return 0;
 
+    }
+
+    // unit test
+    public static void main(String[] args) {
+        In in = new In("data/dictionary-algs4.txt");
+        String[] dictionary = in.readAllStrings();
+        BoggleSolver solver = new BoggleSolver(dictionary);
+        BoggleBoard board = new BoggleBoard("data/board4x4.txt");
+        for (Die d : solver.neighbor(board, 2, 2)) {
+            StdOut.println(d);
+        }
+
+        StdOut.println("ABANDONED ? " + solver.isInDict("ABANDONED"));
+        StdOut.println("EQUATIONS ? " + solver.isInDict("EQUATIONS"));
+        StdOut.println("NOTINIT ? " + solver.isInDict("NOTINIT"));
+
+        StdOut.println("(1, 1): " + solver.toIndex(board, 1, 1));
+        StdOut.println("(2, 3): " + solver.toIndex(board, 2, 3));
     }
 
 }
