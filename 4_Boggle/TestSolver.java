@@ -5,6 +5,25 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class TestSolver {
 
+    // Method neighbor = null;
+
+    // @org.junit.Before
+    // public void setUp() throws Exception {
+    //     // set private method visible
+    //     neighbor = BoggleSolver.class.getDeclaredMethod("neighbor", String.class);
+    //     neighbor.setAccessible(true);
+    // }
+
+    // @org.junit.Test
+    // public void testMethod() throws Exception {
+    //     printHeader("testBoggleSolver");
+    //     In in = new In("data/dictionary-algs4.txt");
+    //     BoggleBoard board = new BoggleBoard("data/board4x4.txt");
+    //     String[] dictionary = in.readAllStrings();
+    //     BoggleSolver solver = new BoggleSolver(dictionary);
+    //     Iterable<Die> result = (Iterable<Die>) neighbor.invoke(solver, board, 2, 2);
+    // }
+
     @Test
     public void testBoggleSolver() {
         printHeader("testBoggleSolver");
