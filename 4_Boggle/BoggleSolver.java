@@ -98,7 +98,13 @@ public class BoggleSolver {
 
                 if (!marked[nbr.row][nbr.col]) {
                     char next = board.getLetter(nbr.row, nbr.col);
-                    getAllValidWords(board, nbr, word + next);
+
+                    if (next == 'Q') {
+                        getAllValidWords(board, nbr, word + "QU");
+                    } else {
+                        getAllValidWords(board, nbr, word + next);
+                    }
+
                 }
             }
             marked[d.row][d.col] = false; // unmark the die as unvisited
