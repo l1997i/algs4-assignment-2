@@ -63,8 +63,7 @@ public class BoggleSolver {
      * @return
      */
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        // TODO:
-
+        
         final int rows = board.rows();
         final int cols = board.cols();
         marked = new boolean[rows][cols];
@@ -141,10 +140,36 @@ public class BoggleSolver {
      * @return
      */
     public int scoreOf(String word) {
-        // TODO:
+        // invalid word
+        if (word.length() < 3 || !isInDict(word)) {
+            return 0;
+        }
 
-        return 0;
+        // valid word
+        return scoreWord(word);
 
+    }
+
+    /**
+     * Score a word based off typical Boggle scoring.
+     * 
+     * @param s Word to score
+     * @return Score of the word passed in
+     */
+    private int scoreWord(String s) {
+        int pointValue;
+        int length = s.length();
+        if (length < 5)
+            pointValue = 1;
+        else if (length == 5)
+            pointValue = 2;
+        else if (length == 6)
+            pointValue = 3;
+        else if (length == 7)
+            pointValue = 5;
+        else
+            pointValue = 11;
+        return pointValue;
     }
 
     // unit test
