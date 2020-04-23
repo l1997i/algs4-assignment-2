@@ -23,6 +23,7 @@ public class BoggleSolver {
     private boolean[][] marked;
     private SET<String> validWords;
     private BoggleBoard board;
+    private Object[][] adj;
 
     /**
      * Initializes the data structure using the given array of strings as the
@@ -67,7 +68,7 @@ public class BoggleSolver {
 
         this.board = board;
         this.validWords = new SET<>();
-
+        precomputeAdj();
         final int rows = board.rows();
         final int cols = board.cols();
         marked = new boolean[rows][cols];
@@ -104,8 +105,10 @@ public class BoggleSolver {
         if (dict.containsPrefix(word)) {
             // dfs
             marked[d.row][d.col] = true;
-            for (Die nbr : neighbor(d.row, d.col)) {
 
+            for (Object nbrx : (Bag<?>) adj[d.row][d.col]) {
+
+                Die nbr = (Die) nbrx;
                 if (!marked[nbr.row][nbr.col]) {
                     char next = board.getLetter(nbr.row, nbr.col);
 
@@ -126,21 +129,25 @@ public class BoggleSolver {
         return dict.contains(word);
     }
 
-    private Iterable<Die> neighbor(int r, int c) {
-        Bag<Die> retBag = new Bag<>();
+    // precompute the Boggle graph, i.e., the set of cubes adjacent to each cube
+    private void precomputeAdj() {
         int boardCols = board.cols();
         int boardRows = board.rows();
-
-        for (int offset_r = -1; offset_r <= 1; offset_r++) {
-            for (int offset_c = -1; offset_c <= 1; offset_c++) {
-                Die d = new Die(r + offset_r, c + offset_c);
-                if (!(offset_r == 0 && offset_c == 0) && d.isValid(boardRows, boardCols)) {
-                    retBag.add(d);
+        adj = new Object[boardRows][boardCols];
+        for (int r = 0; r < boardRows; r++) {
+            for (int c = 0; c < boardCols; c++) {
+                Bag<Die> retBag = new Bag<>();
+                for (int offset_r = -1; offset_r <= 1; offset_r++) {
+                    for (int offset_c = -1; offset_c <= 1; offset_c++) {
+                        Die d = new Die(r + offset_r, c + offset_c);
+                        if (!(offset_r == 0 && offset_c == 0) && d.isValid(boardRows, boardCols)) {
+                            retBag.add(d);
+                        }
+                    }
                 }
+                adj[r][c] = retBag;
             }
         }
-
-        return retBag;
     }
 
     /**
@@ -188,10 +195,6 @@ public class BoggleSolver {
         In in = new In("data/dictionary-algs4.txt");
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
-        BoggleBoard board = new BoggleBoard("data/board4x4.txt");
-        for (Die d : solver.neighbor(2, 2)) {
-            StdOut.println(d);
-        }
 
         StdOut.println("ABANDONED ? " + solver.isInDict("ABANDONED"));
         StdOut.println("EQUATIONS ? " + solver.isInDict("EQUATIONS"));
