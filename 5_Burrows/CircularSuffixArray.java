@@ -19,24 +19,6 @@ public class CircularSuffixArray {
     private int length;
 
     /**
-     * Not to create new String objects when sorting the suffixes. That would take
-     * quadratic space. A natural approach is to define a nested class
-     * CircularSuffix that represents a circular suffix implicitly (via a reference
-     * to the input string and a pointer to the first character in the circular
-     * suffix). The constructor of CircularSuffix should take constant time and use
-     * constant space.
-     */
-    private class CircularSuffix {
-        String s;
-        int index;
-
-        public CircularSuffix(String textString, int index) {
-            this.s = textString;
-            this.index = index;
-        }
-    }
-
-    /**
      * circular suffix array of s
      * 
      * @param s
