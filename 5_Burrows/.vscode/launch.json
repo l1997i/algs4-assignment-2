@@ -12,13 +12,22 @@
         },
         {
             "type": "java",
-            "name": "Debug BurrowsWheele",
+            "name": "Debug BurrowsWheele (transform)",
             "request": "launch",
             "mainClass": "BurrowsWheele",
             "args": [
                 "-",
                 "<",
                 "data/abra.txt"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "Debug BurrowsWheele (inverseTransform)",
+            "request": "launch",
+            "mainClass": "BurrowsWheele",
+            "args": [
+                "+",
             ]
         },
         {
