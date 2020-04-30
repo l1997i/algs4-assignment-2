@@ -26,6 +26,8 @@ public class MoveToFront {
         }
 
         /* Read char in binary form */
+        /* asciiTable[input_char] = encode_int */
+        /* asciiTable['A'] = 6 means when you read 'A' from input, then encode to 6 */
         while (!BinaryStdIn.isEmpty()) {
             char currChar = BinaryStdIn.readChar();
             char currCharNo = asciiTable[currChar];
@@ -51,16 +53,14 @@ public class MoveToFront {
         final int R = 256; /* Extended-ASCII */
         char[] asciiTable = new char[R];
 
-        /**
-         * init: asciiTable => asciiTable[input_code] = decode_char
-         * 
-         * asciiTable[0] = 'A' means when you read 0 from input, then decode to 'A'
-         */
+        /* init: asciiTable */
         for (int i = 0; i < R; i++) {
             asciiTable[i] = (char) i;
         }
 
         /* Read char in binary form */
+        /* asciiTable[input_code] = decode_char */
+        /* asciiTable[0] = 'A' means when you read 0 from input, then decode to 'A' */
         while (!BinaryStdIn.isEmpty()) {
             char currChar = BinaryStdIn.readChar();
             char currCharNo = asciiTable[currChar];
