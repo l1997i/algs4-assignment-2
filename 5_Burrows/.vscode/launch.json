@@ -40,9 +40,14 @@
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-MoveToFront",
+            "name": "Debug MoveToFront (encode)",
             "request": "launch",
             "mainClass": "MoveToFront",
+            "args": [
+                "-",
+                "<",
+                "data/abra.txt"
+            ]
         }
     ]
 }
