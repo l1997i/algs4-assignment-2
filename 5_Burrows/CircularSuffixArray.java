@@ -30,7 +30,7 @@ public class CircularSuffixArray {
             throw new IllegalArgumentException("argument s is null");
         }
 
-        this.textString = new String(s);
+        this.textString = s;
         this.length = textString.length();
         this.index = new int[length];
 
