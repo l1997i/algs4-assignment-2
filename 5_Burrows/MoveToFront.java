@@ -48,6 +48,31 @@ public class MoveToFront {
      * standard output
      */
     public static void decode() {
+        final int R = 256; /* Extended-ASCII */
+        char[] asciiTable = new char[R];
+
+        /**
+         * init: asciiTable => asciiTable[input_code] = decode_char
+         * 
+         * asciiTable[0] = 'A' means when you read 0 from input, then decode to 'A'
+         */
+        for (int i = 0; i < R; i++) {
+            asciiTable[i] = (char) i;
+        }
+
+        /* Read char in binary form */
+        while (!BinaryStdIn.isEmpty()) {
+            char currChar = BinaryStdIn.readChar();
+            char currCharNo = asciiTable[currChar];
+            BinaryStdOut.write(currCharNo, 8);
+            /* move all the char in front of current char 1 place back */
+            for (int i = currChar; i > 0; i--) {
+                asciiTable[i] = asciiTable[i - 1];
+            }
+            asciiTable[0] = currCharNo; /* move current char to the front */
+        }
+
+        BinaryStdOut.close();
 
     }
 
