@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.BinaryStdIn;
+import edu.princeton.cs.algs4.BinaryStdOut;
 
 /**
  * Move-to-front encoding. Given a text file in which sequences of the same
@@ -16,10 +17,30 @@ public class MoveToFront {
      */
     public static void encode() {
 
-        while (!BinaryStdIn.isEmpty()) {
-            BinaryStdIn.readChar();
+        final int R = 256; /* Extended-ASCII */
+        char[] asciiTable = new char[R];
+
+        /* init: asciiTable */
+        for (int i = 0; i < R; i++) {
+            asciiTable[i] = (char) i;
         }
 
+        /* Read char in binary form */
+        while (!BinaryStdIn.isEmpty()) {
+            char currChar = BinaryStdIn.readChar();
+            char currCharNo = asciiTable[currChar];
+            BinaryStdOut.write(asciiTable[currCharNo], 8);
+            /* move all the char in front of current char 1 place back */
+            for (int i = 0; i < R; i++) {
+                char iNo = asciiTable[i];
+                if (iNo < currCharNo) {
+                    asciiTable[i]++;
+                }
+            }
+            asciiTable[currChar] = 0; /* move current char to the front */
+        }
+
+        BinaryStdOut.close();
     }
 
     /**
