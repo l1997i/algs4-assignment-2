@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.Quick3string;
 import edu.princeton.cs.algs4.StdOut;
 
 /**
