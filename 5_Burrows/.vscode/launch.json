@@ -6,12 +6,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug (Launch) - Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
             "name": "Debug BurrowsWheele (transform)",
             "request": "launch",
             "mainClass": "BurrowsWheele",
@@ -34,12 +28,6 @@
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-CircularSuffixArray",
-            "request": "launch",
-            "mainClass": "CircularSuffixArray",
-        },
-        {
-            "type": "java",
             "name": "Debug MoveToFront (encode)",
             "request": "launch",
             "mainClass": "MoveToFront",
@@ -47,6 +35,17 @@
                 "-",
                 "<",
                 "data/abra.txt"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "Debug MoveToFront (decode)",
+            "request": "launch",
+            "mainClass": "MoveToFront",
+            "args": [
+                "+",
+                "<",
+                "data/abra.txt.mtf"
             ]
         }
     ]
