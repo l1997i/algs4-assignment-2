@@ -38,7 +38,9 @@ public class CircularSuffixArray {
     }
 
     /**
-     * returns index of ith sorted suffix
+     * Returns index of ith sorted suffix. We define index[i] to be the index of the
+     * original suffix that appears ith in the sorted array. For example, index[11]
+     * = 2 means that the 2nd original suffix appears 11th in the sorted order.
      * 
      * @param i
      * @throws IllegalArgumentException if the argument {@code i} is outside its
