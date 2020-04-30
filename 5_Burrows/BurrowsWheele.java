@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
+import edu.princeton.cs.algs4.LSD;
 
 /**
  * Burrows–Wheeler inverse transform. Now, we describe how to invert the
@@ -52,9 +53,34 @@ public class BurrowsWheele {
 
     /**
      * apply Burrows-Wheeler inverse transform, reading from standard input and
-     * writing to standard output
+     * writing to standard output. This is a Least-Significant-Digit First (LSD)
+     * implement.
      */
     public static void inverseTransform() {
+
+        final int R = 256; /* Extended-ASCII */
+        int first = BinaryStdIn.readInt();
+        String textString = BinaryStdIn.readString();
+        int n = textString.length();
+        int[] next = new int[n];
+
+        /* compute frequency counts */
+        int[] count = new int[R + 1];
+        for (int i = 0; i < n; i++)
+            count[textString.charAt(i) + 1]++;
+
+        /* compute cumulates */
+        for (int r = 0; r < R; r++)
+            count[r + 1] += count[r];
+
+        /* move data */
+        for (int i = 0; i < n; i++)
+            next[count[textString.charAt(i)]++] = i;
+
+        /* writing to StdOut */
+        for (int j = 0, k = next[first]; j < n; j++, k = next[k])
+            BinaryStdOut.write(textString.charAt(k));
+        BinaryStdOut.close();
 
     }
 
