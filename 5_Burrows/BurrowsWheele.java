@@ -1,3 +1,6 @@
+import edu.princeton.cs.algs4.BinaryStdIn;
+import edu.princeton.cs.algs4.BinaryStdOut;
+
 /**
  * Burrows–Wheeler inverse transform. Now, we describe how to invert the
  * Burrows–Wheeler transform and recover the original input string. If the jth
@@ -21,6 +24,30 @@ public class BurrowsWheele {
      */
     public static void transform() {
 
+        String textString = BinaryStdIn.readString();
+        StringBuilder rst = new StringBuilder(); /* store output result */
+        CircularSuffixArray suffix = new CircularSuffixArray(textString);
+        int length = suffix.length();
+
+        /* find the first and construct the rst */
+        int first = 0;
+        for (int i = 0; i < length; i++) {
+            int index_raw = suffix.index(i);
+            int index = (length + index_raw - 1) % length;
+            rst.append(textString.charAt(index));
+            if (index_raw == 0) {
+                first = i;
+            }
+        }
+
+        /* write back rst to StdOut */
+        BinaryStdOut.write(first, 32);
+
+        for (int i = 0; i < rst.length(); i++) {
+            BinaryStdOut.write(rst.charAt(i), 8);
+        }
+        BinaryStdOut.close();
+
     }
 
     /**
@@ -38,6 +65,11 @@ public class BurrowsWheele {
      * @param args
      */
     public static void main(String[] args) {
-
+        if (args[0].charAt(0) == '-') {
+            transform();
+        }
+        if (args[0].charAt(0) == '+') {
+            inverseTransform();
+        }
     }
 }
