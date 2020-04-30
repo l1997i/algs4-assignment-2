@@ -1,3 +1,5 @@
+import edu.princeton.cs.algs4.Quick3string;
+
 /**
  * CircularSuffixArray: To efficiently implement the key component in the
  * Burrows–Wheeler transform, we will use a fundamental data structure known as
@@ -11,6 +13,28 @@
  */
 public class CircularSuffixArray {
 
+    private String textString;
+    private int[] index;
+    private int length;
+
+    /**
+     * Not to create new String objects when sorting the suffixes. That would take
+     * quadratic space. A natural approach is to define a nested class
+     * CircularSuffix that represents a circular suffix implicitly (via a reference
+     * to the input string and a pointer to the first character in the circular
+     * suffix). The constructor of CircularSuffix should take constant time and use
+     * constant space.
+     */
+    private class CircularSuffix {
+        String s;
+        int index;
+
+        public CircularSuffix(String textString, int index) {
+            this.s = textString;
+            this.index = index;
+        }
+    }
+
     /**
      * circular suffix array of s
      * 
@@ -22,6 +46,14 @@ public class CircularSuffixArray {
 
         if (s == null) {
             throw new IllegalArgumentException("argument s is null");
+        }
+
+        this.textString = new String(s);
+        this.length = textString.length();
+        this.index = new int[length];
+
+        for (int i = 0; i < length; i++) {
+            this.index[i] = i;
         }
 
     }
@@ -50,12 +82,16 @@ public class CircularSuffixArray {
     public int index(int i) {
         // TODO:
 
+        isValid(i);
+
+        return 0;
+    }
+
+    private void isValid(int i) {
         int n = length();
         if (i < 0 || i > n - 1) {
             throw new IllegalArgumentException("argument outside prescribed range");
         }
-
-        return 0;
     }
 
     // unit testing (required)
