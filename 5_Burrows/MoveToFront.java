@@ -1,3 +1,5 @@
+import edu.princeton.cs.algs4.BinaryStdIn;
+
 /**
  * Move-to-front encoding. Given a text file in which sequences of the same
  * character occur near each other many times, convert it into a text file in
@@ -14,6 +16,10 @@ public class MoveToFront {
      */
     public static void encode() {
 
+        while (!BinaryStdIn.isEmpty()) {
+            BinaryStdIn.readChar();
+        }
+
     }
 
     /**
@@ -25,13 +31,19 @@ public class MoveToFront {
     }
 
     /**
-     * if args[0] is "-", apply move-to-front encoding if args[0] is "+", apply
+     * if args[0] is "-", apply move-to-front encoding; if args[0] is "+", apply
      * move-to-front decoding
      * 
      * @param args
      */
     public static void main(String[] args) {
 
+        if (args[0] == "-") {
+            encode();
+        }
+        if (args[0] == "+") {
+            decode();
+        }
     }
 
 }
