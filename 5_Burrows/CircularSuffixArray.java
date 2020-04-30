@@ -25,7 +25,7 @@ public class CircularSuffixArray {
      * @throws IllegalArgumentException if the argument {@code s} is null
      */
     public CircularSuffixArray(String s) {
-        // TODO:
+        // DEBUG:
 
         if (s == null) {
             throw new IllegalArgumentException("argument s is null");
@@ -74,7 +74,7 @@ public class CircularSuffixArray {
             // find item on hi to swap
             while (less(v, index[--j])) {
                 if (j == lo)
-                    break; // redundant since a[lo] acts as sentinel
+                    break; // redundant since index[lo] acts as sentinel
             }
 
             // check if pointers cross
@@ -84,10 +84,10 @@ public class CircularSuffixArray {
             exch(index, i, j);
         }
 
-        // put partitioning item v at a[j]
+        // put partitioning item v at index[j]
         exch(index, lo, j);
 
-        // now, a[lo .. j-1] <= a[j] <= a[j+1 .. hi]
+        // now, index[lo .. j-1] <= index[j] <= index[j+1 .. hi]
         return j;
     }
 
@@ -107,7 +107,7 @@ public class CircularSuffixArray {
         return false;
     }
 
-    // exchange a[i] and a[j]
+    // exchange index[i] and index[j]
     private void exch(int[] index, int i, int j) {
         int swap = index[i];
         index[i] = index[j];
@@ -120,9 +120,9 @@ public class CircularSuffixArray {
      * @return the length of s
      */
     public int length() {
-        // TODO:
+        // DEBUG:
 
-        return 0;
+        return this.length;
     }
 
     /**
@@ -136,11 +136,11 @@ public class CircularSuffixArray {
      * @return index of ith sorted suffix
      */
     public int index(int i) {
-        // TODO:
+        // DEBUG:
 
         isValid(i);
 
-        return 0;
+        return this.index[i];
     }
 
     private void isValid(int i) {
@@ -152,7 +152,7 @@ public class CircularSuffixArray {
 
     // unit testing (required)
     public static void main(String[] args) {
-        // TODO:
+        // DEBUG:
 
         CircularSuffixArray array = new CircularSuffixArray("ABRACADABRA!");
         StdOut.println("ABRACADABRA!");
