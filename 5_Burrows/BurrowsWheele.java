@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
-import edu.princeton.cs.algs4.LSD;
 
 /**
  * Burrows–Wheeler inverse transform. Now, we describe how to invert the
