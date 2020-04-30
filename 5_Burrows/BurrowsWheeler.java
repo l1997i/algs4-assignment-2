@@ -16,7 +16,7 @@ import edu.princeton.cs.algs4.BinaryStdOut;
  * @author Li Li
  * @since Apr. 30, 2020
  */
-public class BurrowsWheele {
+public class BurrowsWheeler {
 
     /**
      * apply Burrows-Wheeler transform, reading from standard input and writing to
