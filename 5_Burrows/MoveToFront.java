@@ -38,10 +38,10 @@ public class MoveToFront {
      */
     public static void main(String[] args) {
 
-        if (args[0] == "-") {
+        if (args[0].charAt(0) == '-') {
             encode();
         }
-        if (args[0] == "+") {
+        if (args[0].charAt(0) == '+') {
             decode();
         }
     }
