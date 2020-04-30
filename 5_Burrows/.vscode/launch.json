@@ -28,6 +28,8 @@
             "mainClass": "BurrowsWheele",
             "args": [
                 "+",
+                "<",
+                "data/abra.txt.bwt"
             ]
         },
         {
