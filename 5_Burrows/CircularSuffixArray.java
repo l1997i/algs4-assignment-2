@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.Quick3string;
+import edu.princeton.cs.algs4.StdOut;
 
 /**
  * CircularSuffixArray: To efficiently implement the key component in the
@@ -56,6 +57,79 @@ public class CircularSuffixArray {
             this.index[i] = i;
         }
 
+        sortCore(index);
+
+    }
+
+    private void sortCore(int[] index) {
+        sort(index, 0, index.length - 1);
+    }
+
+    // quicksort the subarray from a[lo] to a[hi]
+    private void sort(int[] index, int lo, int hi) {
+        if (hi <= lo)
+            return;
+        int j = partition(index, lo, hi);
+        sort(index, lo, j - 1);
+        sort(index, j + 1, hi);
+    }
+
+    // partition the subarray index[lo..hi]
+    // so that index[lo..j-1] <= index[j] <= index[j+1..hi]
+    // and return the index j.
+    private int partition(int[] index, int lo, int hi) {
+        int i = lo;
+        int j = hi + 1;
+        int v = index[lo];
+        while (true) {
+
+            // find item on lo to swap
+            while (less(index[++i], v)) {
+                if (i == hi)
+                    break;
+            }
+
+            // find item on hi to swap
+            while (less(v, index[--j])) {
+                if (j == lo)
+                    break; // redundant since a[lo] acts as sentinel
+            }
+
+            // check if pointers cross
+            if (i >= j)
+                break;
+
+            exch(index, i, j);
+        }
+
+        // put partitioning item v at a[j]
+        exch(index, lo, j);
+
+        // now, a[lo .. j-1] <= a[j] <= a[j+1 .. hi]
+        return j;
+    }
+
+    // is v < w ?
+    private boolean less(int v, int w) {
+        int v1, w1;
+        for (int k = 0; k < length; k++) {
+            v1 = (v + k) % length;
+            w1 = (w + k) % length;
+            if (textString.charAt(v1) > textString.charAt(w1)) {
+                return false;
+            }
+            if (textString.charAt(v1) < textString.charAt(w1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // exchange a[i] and a[j]
+    private void exch(int[] index, int i, int j) {
+        int swap = index[i];
+        index[i] = index[j];
+        index[j] = swap;
     }
 
     /**
@@ -98,5 +172,10 @@ public class CircularSuffixArray {
     public static void main(String[] args) {
         // TODO:
 
+        CircularSuffixArray array = new CircularSuffixArray("ABRACADABRA!");
+        StdOut.println("ABRACADABRA!");
+        for (int i = 0; i < array.length(); i++) {
+            StdOut.println(array.index(i));
+        }
     }
 }
