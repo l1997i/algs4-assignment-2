@@ -29,7 +29,7 @@ public class MoveToFront {
         while (!BinaryStdIn.isEmpty()) {
             char currChar = BinaryStdIn.readChar();
             char currCharNo = asciiTable[currChar];
-            BinaryStdOut.write(asciiTable[currCharNo], 8);
+            BinaryStdOut.write(currCharNo, 8);
             /* move all the char in front of current char 1 place back */
             for (int i = 0; i < R; i++) {
                 char iNo = asciiTable[i];
