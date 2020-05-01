@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
@@ -18,28 +19,23 @@ public class MoveToFront {
     public static void encode() {
 
         final int R = 256; /* Extended-ASCII */
-        char[] asciiTable = new char[R];
+        LinkedList<Character> asciiTable = new LinkedList<>();
 
         /* init: asciiTable */
         for (int i = 0; i < R; i++) {
-            asciiTable[i] = (char) i;
+            asciiTable.add((char) i);
         }
 
         /* Read char in binary form */
-        /* asciiTable[input_char] = encode_int */
-        /* asciiTable['A'] = 6 means when you read 'A' from input, then encode to 6 */
+        /* asciiTable.indexOf(input_char) = encode_int */
+        /* asciiTable.indexOf('A') = 6 means
+        /* when you read 'A' from input, then encode to 6 */
         while (!BinaryStdIn.isEmpty()) {
             char currChar = BinaryStdIn.readChar();
-            char currCharNo = asciiTable[currChar];
+            int currCharNo = asciiTable.indexOf(currChar);
             BinaryStdOut.write(currCharNo, 8);
-            /* move all the char in front of current char 1 place back */
-            for (int i = 0; i < R; i++) {
-                char iNo = asciiTable[i];
-                if (iNo < currCharNo) {
-                    asciiTable[i]++;
-                }
-            }
-            asciiTable[currChar] = 0; /* move current char to the front */
+            Character firstChar = asciiTable.remove(currCharNo);
+            asciiTable.addFirst(firstChar); /* move current char to the front */
         }
 
         BinaryStdOut.close();
