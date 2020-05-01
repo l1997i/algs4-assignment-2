@@ -14,8 +14,28 @@ import edu.princeton.cs.algs4.StdOut;
 public class CircularSuffixArray {
 
     private String textString;
-    private int[] index;
     private int length;
+    private CircularSuffix[] cs;
+
+    private class CircularSuffix {
+        private String orgString; /* the original text string */
+        private int ptr; /* the pointer to the string */
+
+        public CircularSuffix(int index) {
+            orgString = textString;
+            ptr = index;
+        }
+
+        /**
+         * return the d(th) char of ptr(th) string in original suffixes
+         * 
+         * @param d the d(th) char
+         * @return the char in original suffixes
+         */
+        public char charAt(int d) {
+            return orgString.charAt((d + ptr) % length);
+        }
+    }
 
     /**
      * circular suffix array of s
@@ -24,7 +44,6 @@ public class CircularSuffixArray {
      * @throws IllegalArgumentException if the argument {@code s} is null
      */
     public CircularSuffixArray(String s) {
-        // DEBUG:
 
         if (s == null) {
             throw new IllegalArgumentException("argument s is null");
@@ -32,101 +51,70 @@ public class CircularSuffixArray {
 
         this.textString = s;
         this.length = textString.length();
-        this.index = new int[length];
+        this.cs = new CircularSuffix[length];
 
-        for (int i = 0; i < length; i++) {
-            this.index[i] = i;
+        /* init: the circular suffix array */
+        for (int i = 0; i < s.length(); i++) {
+            cs[i] = new CircularSuffix(i);
         }
 
-        sort(index);
+        quick3string(0, length - 1, 0);
 
     }
 
-    private void sort(int[] index) {
-        sortCore(index, 0, index.length - 1);
-    }
-
-    // quicksort the subarray from index[lo] to index[hi]
-    private void sortCore(int[] index, int lo, int hi) {
-
-        if (hi <= lo)
-            return;
+    // 3-way string quicksort cs[lo..hi] starting at d(th) character
+    private void quick3string(int lo, int hi, int d) {
 
         // cutoff to insertion sort for small subarrays
-        final int CUTOFF = 8;
+        final int CUTOFF = 20;
         if (hi <= lo + CUTOFF) {
-            insertion(index, lo, hi);
+            insertion(lo, hi, d);
             return;
         }
 
-        int j = partition(index, lo, hi);
-        sortCore(index, lo, j - 1);
-        sortCore(index, j + 1, hi);
-    }
-
-    // insertion sort from index[lo] to index[hi]
-    private void insertion(int[] index, int lo, int hi) {
-        for (int i = lo; i <= hi; i++)
-            for (int j = i; j > lo && less(index[j], index[j - 1]); j--)
-                exch(index, j, j - 1);
-    }
-
-    // partition the subarray index[lo..hi]
-    // so that index[lo..j-1] <= index[j] <= index[j+1..hi]
-    // and return the index j.
-    private int partition(int[] index, int lo, int hi) {
-        int i = lo;
-        int j = hi + 1;
-        int v = index[lo];
-        while (true) {
-
-            // find item on lo to swap
-            while (less(index[++i], v)) {
-                if (i == hi)
-                    break;
-            }
-
-            // find item on hi to swap
-            while (less(v, index[--j])) {
-                if (j == lo)
-                    break; // redundant since index[lo] acts as sentinel
-            }
-
-            // check if pointers cross
-            if (i >= j)
-                break;
-
-            exch(index, i, j);
+        int lt = lo, gt = hi;
+        int v = cs[lo].charAt(d);
+        int i = lo + 1;
+        while (i <= gt) {
+            int t = cs[i].charAt(d);
+            if (t < v)
+                exch(lt++, i++);
+            else if (t > v)
+                exch(i, gt--);
+            else
+                i++;
         }
 
-        // put partitioning item v at index[j]
-        exch(index, lo, j);
-
-        // now, index[lo .. j-1] <= index[j] <= index[j+1 .. hi]
-        return j;
+        // cs[lo..lt-1] < v = cs[lt..gt] < cs[gt+1..hi].
+        quick3string(lo, lt - 1, d);
+        if (v >= 0)
+            quick3string(lt, gt, d + 1);
+        quick3string(gt + 1, hi, d);
     }
 
-    // is v < w ?
-    private boolean less(int v, int w) {
-        int v1, w1;
-        for (int k = 0; k < length; k++) {
-            v1 = (v + k) % length;
-            w1 = (w + k) % length;
-            if (textString.charAt(v1) > textString.charAt(w1)) {
-                return false;
-            }
-            if (textString.charAt(v1) < textString.charAt(w1)) {
+    // sort from cs[lo] to cs[hi], starting at the dth character
+    private void insertion(int lo, int hi, int d) {
+        for (int i = lo; i <= hi; i++)
+            for (int j = i; j > lo && less(j, j - 1, d); j--)
+                exch(j, j - 1);
+    }
+
+    // is cs[v] < cs[w] at d(th) char?
+    private boolean less(int v, int w, int d) {
+        for (int i = d; i < length; i++) {
+            if (cs[v].charAt(i) < cs[w].charAt(i))
                 return true;
-            }
+            if (cs[v].charAt(i) > cs[w].charAt(i))
+                return false;
         }
         return false;
     }
 
-    // exchange index[i] and index[j]
-    private void exch(int[] index, int i, int j) {
-        int swap = index[i];
-        index[i] = index[j];
-        index[j] = swap;
+    // exchange cs[i] and cs[j]
+    private void exch(int i, int j) {
+        CircularSuffix swap = cs[i];
+        cs[i] = cs[j];
+        cs[j] = swap;
     }
 
     /**
@@ -135,7 +123,6 @@ public class CircularSuffixArray {
      * @return the length of s
      */
     public int length() {
-        // DEBUG:
 
         return this.length;
     }
@@ -151,11 +138,10 @@ public class CircularSuffixArray {
      * @return index of ith sorted suffix
      */
     public int index(int i) {
-        // DEBUG:
 
         isValid(i);
 
-        return this.index[i];
+        return this.cs[i].ptr;
     }
 
     private void isValid(int i) {
@@ -167,8 +153,6 @@ public class CircularSuffixArray {
 
     // unit testing (required)
     public static void main(String[] args) {
-        // DEBUG:
-
         CircularSuffixArray array = new CircularSuffixArray("ABRACADABRA!");
         StdOut.println("ABRACADABRA!");
         for (int i = 0; i < array.length(); i++) {
