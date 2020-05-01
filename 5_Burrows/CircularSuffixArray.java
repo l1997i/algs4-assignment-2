@@ -38,21 +38,37 @@ public class CircularSuffixArray {
             this.index[i] = i;
         }
 
-        sortCore(index);
+        sort(index);
 
     }
 
-    private void sortCore(int[] index) {
-        sort(index, 0, index.length - 1);
+    private void sort(int[] index) {
+        sortCore(index, 0, index.length - 1);
     }
 
-    // quicksort the subarray from a[lo] to a[hi]
-    private void sort(int[] index, int lo, int hi) {
+    // quicksort the subarray from index[lo] to index[hi]
+    private void sortCore(int[] index, int lo, int hi) {
+
         if (hi <= lo)
             return;
+
+        // cutoff to insertion sort for small subarrays
+        final int CUTOFF = 8;
+        if (hi <= lo + CUTOFF) {
+            insertion(index, lo, hi);
+            return;
+        }
+
         int j = partition(index, lo, hi);
-        sort(index, lo, j - 1);
-        sort(index, j + 1, hi);
+        sortCore(index, lo, j - 1);
+        sortCore(index, j + 1, hi);
+    }
+
+    // insertion sort from index[lo] to index[hi]
+    private void insertion(int[] index, int lo, int hi) {
+        for (int i = lo; i <= hi; i++)
+            for (int j = i; j > lo && less(index[j], index[j - 1]); j--)
+                exch(index, j, j - 1);
     }
 
     // partition the subarray index[lo..hi]
